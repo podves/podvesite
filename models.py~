@@ -1,5 +1,5 @@
 from flask.ext.security import UserMixin, RoleMixin
-from podvesite import db
+from __init__ import db
 
 
 class Role(db.Document, RoleMixin):
@@ -12,17 +12,18 @@ class Date(db.Document):
     active = db.BooleanField(default=True)
 
 
+class Course(db.Document):
+    teacher = db.StringField(max_length=255)
+    place = db.StringField(max_length=255)
+    date = db.ReferenceField(Date)
+
+
 class User(db.Document, UserMixin):
     email = db.StringField(max_length=255)
     password = db.StringField(max_length=255)
     tariff = db.StringField(max_length=32)
     active = db.BooleanField(default=True)
     confirmed_at = db.DateTimeField()
-    interests = db.ListField(db.StringField(max_length=255), default=[])
+    participance = db.ReferenceField(Course)
+    interests = db.ListField(db.StringField, default=[])
     roles = db.ListField(db.ReferenceField(Role), default=[])
-
-
-class Course(db.Document):
-    teacher = db.ReferenceField(User)
-    place = db.StringField(max_length=255)
-    date = db.ReferenceField(Date)

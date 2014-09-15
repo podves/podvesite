@@ -6,8 +6,17 @@ from podvesite import db, app
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
+from flask_security.forms import RegisterForm
+from wtforms.fields import *
+
+
+class ExtendedRegisterForm(RegisterForm):
+    interests = SelectMultipleField(
+        'INTERESNTS', choices=[('math', 'математика'), ('it', 'информатика'), ('literature', 'литература'), ('phylosophy', 'философия'), ('music', 'музыка'), ('languages', 'филология'), ('games', 'игры'), ('art', 'искусство')])
+
 user_datastore = MongoEngineUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+security = Security(app, user_datastore,
+                    register_form=ExtendedRegisterForm)
 
 
 class ListView(MethodView):
