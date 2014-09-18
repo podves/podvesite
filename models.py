@@ -22,7 +22,16 @@ class User(db.Document, UserMixin):
     roles = db.ListField(db.ReferenceField(Role), default=[])
 
 
+class Place(db.Document):
+    address = db.StringField(max_length=255)
+    contact = db.StringField(max_length=255)
+    time = db.StringField(max_length=255)
+    capacity = db.DecimalField()
+    comment = db.StringField(max_length=255)
+
+
 class Course(db.Document):
+    students = db.ListField(db.ReferenceField(User), default=[])
     teacher = db.ReferenceField(User)
-    place = db.StringField(max_length=255)
+    place = db.ReferenceField(Place)
     date = db.ReferenceField(Date)

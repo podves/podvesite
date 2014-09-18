@@ -4,7 +4,8 @@ from flask.views import MethodView
 from podvesite.models import Role, User
 from podvesite import db, app
 
-posts = Blueprint('posts', __name__, template_folder='templates')
+main = Blueprint('main', __name__, template_folder='templates')
+users = Blueprint('users', __name__, template_folder='templates')
 
 from flask_security.forms import RegisterForm
 from wtforms.fields import *
@@ -25,5 +26,12 @@ class ListView(MethodView):
         return render_template('index.html')
 
 
+class UsersView(MethodView):
+
+    def get(self):
+        return render_template('users.html')
+
+
 # Register the urls
-posts.add_url_rule('/', view_func=ListView.as_view('list'))
+main.add_url_rule('/', view_func=ListView.as_view('list'))
+users.add_url_rule('/users', view_func=UsersView.as_view('users'))
