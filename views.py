@@ -1,5 +1,5 @@
 from flask.ext.security import Security, MongoEngineUserDatastore
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect
 from flask.views import MethodView
 from podvesite.models import Role, User
 from podvesite import db, app
@@ -8,6 +8,7 @@ from podvesite.htmlCalendar import MonthlyCalendar
 main = Blueprint('main', __name__, template_folder='templates')
 users = Blueprint('users', __name__, template_folder='templates')
 calendar = Blueprint('cal', __name__, template_folder='templates')
+place = Blueprint('place', __name__, template_folder='templates')
 
 from flask_security.forms import RegisterForm
 from wtforms.fields import *
@@ -43,7 +44,42 @@ class CalendarView(MethodView):
         outputFile.close()
         return render_template('calendar.html')
 
+from flask.ext.wtf import Form
+
+
+class AddNewPlaceForm(Form):
+    address = StringField()
+    contact = StringField()
+    time = StringField()
+    capacity = DecimalField()
+    comment = StringField()
+
+
+class AddNewPlaceView(MethodView):
+
+    def __init__(self):
+        self.newPlaceForm = AddNewPlaceForm()
+
+    def get(self):
+        return render_template('new_place.html', form=self.newPlaceForm)
+
+    def post(self):
+        from mongoengine import connect
+        from podvesite.models import Place
+        connect('podvesite')
+        place = Place()
+        place.address = str(self.newPlaceForm.address.data)
+        place.contact = str(self.newPlaceForm.contact.data)
+        place.time = str(self.newPlaceForm.time.data)
+        place.comment = str(self.newPlaceForm.comment.data)
+        place.capacity = int(self.newPlaceForm.capacity.data)
+        place.save()
+        return redirect('/')
+
+
 # Register the urls
 main.add_url_rule('/', view_func=ListView.as_view('list'))
 users.add_url_rule('/users', view_func=UsersView.as_view('users'))
 calendar.add_url_rule('/calendar', view_func=CalendarView.as_view('calend'))
+place.add_url_rule(
+    '/new_place', view_func=AddNewPlaceView.as_view('new_place'))

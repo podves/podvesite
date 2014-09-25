@@ -1,0 +1,26 @@
+{% block content %}
+<h1>Add new place</h1>
+<form action="" method="post" name="login">
+    <p>
+        Please enter the address(string):<br>
+        {{form.address}}<br>
+    </p>
+    <p>
+        Please enter the contact(string):<br>
+        {{form.contact}}<br>
+    </p>
+    <p>
+        Please enter the time(string):<br>
+        {{form.time}}<br>
+    </p>
+    <p>
+        Please enter the capacity(decimal):<br>
+        {{form.capacity}}<br>
+    </p>
+    <p>
+        Please enter the comment(string):<br>
+        {{form.comment}}<br>
+    </p>
+    <p><input type="submit" value="ok"></p>
+</form>
+{% endblock %}
