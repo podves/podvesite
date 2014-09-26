@@ -16,6 +16,7 @@
 {% if current_user.is_authenticated() %}
   <li>Hello {{ current_user.email }}</li>
   <li><a href="{{ url_for('security.logout') }}">Logout</a></li>
+  <li><a href="{{ url_for("PROFILE//TODO") }}">Profile</a></li> 
 {% else %}
   <li><a href="{{ url_for('security.login') }}">Login</a></li>
   <li><a href="{{ url_for('security.register') }}">Register</a></li>

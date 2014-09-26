@@ -1,25 +1,50 @@
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 <h1>Add new place</h1>
 <form action="" method="post" name="login">
+    {{form.hidden_tag()}}
     <p>
-        Please enter the address(string):<br>
-        {{form.address}}<br>
+        Please enter the address:<br>
+        {{form.address}}
+                {% for error in form.address.errors %}
+                    <span style="color: red;">{{error}}</span>
+                {% endfor %}
     </p>
     <p>
-        Please enter the contact(string):<br>
-        {{form.contact}}<br>
+        Please enter the contact:<br>
+        {{form.contact}}
+                {% for error in form.contact.errors %}
+        <span style="color: red;">{{error}}</span>
+        {% endfor %}<br>
     </p>
     <p>
-        Please enter the time(string):<br>
-        {{form.time}}<br>
+        Please enter the time:<br>
+        {{form.time}}
+                {% for error in form.time.errors %}
+        <span style="color: red;">{{error}}</span>
+        {% endfor %}<br>
     </p>
     <p>
-        Please enter the capacity(decimal):<br>
-        {{form.capacity}}<br>
+        Please enter the capacity:<br>
+        {{form.capacity}}
+        {% for error in form.capacity.errors %}
+        <span style="color: red;">{{error}}</span>
+        {% endfor %}<br>
     </p>
     <p>
-        Please enter the comment(string):<br>
-        {{form.comment}}<br>
+        Please enter the comment):<br>
+        {{form.comment}}
+                {% for error in form.errors.comment %}
+        <span style="color: red;">{{error}}</span>
+        {% endfor %}<br>
     </p>
     <p><input type="submit" value="ok"></p>
 </form>
