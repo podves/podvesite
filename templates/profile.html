@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<li><a href="{{ url_for('profile.profile_edit') }}">Edit</a></li>
+
+
+{{ items.email }}
+{{ items.active }}
+
+{% for i in items.interests %}
+
+{{ i }}
+
+{% endfor %}
+
+{% endblock %}
