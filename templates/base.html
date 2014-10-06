@@ -29,17 +29,13 @@
                 </div>
                 <div class="span6">
             <!-- Start of FORM -->
-                    <!-- <form method="post" action="/login/" class="form-inline loginform"> -->
-                    <form method="post" class="form-inline loginform">
+            <form method="post" class="form-inline loginform">
             {% block authform %}
             {% if current_user.is_authenticated() %}<p class="lead"><a href="{{ url_for('profile.profile') }}">Профиль</a> | <a href="{{ url_for('security.logout') }}">Выйти</a></p>
             {% else %}
-            {# {{ form.hidden_tag() }} #}
-                    <!-- <input type="text" name="username" id="username" class="span2" value="" placeholder="Логин">
-                    <input type="password" name="password" id="password"  class="span2" value="" placeholder="Пароль"> -->
-                    <button type="button" data-toggle="modal" data-target="#myModal" data-remote="/login" class="btn btn-primary">Войти</button>
-                    <!-- <input type="hidden" name="next" value="/" /> -->
-                    {% endif %}
+                <a href="/register" class="btn btn-info">Зарегистрироваться</a>
+                <a href="/login" class="btn btn-primary">Войти</a>
+            {% endif %}
             {% endblock %}
             </form>
             <!-- End of FORM -->
@@ -85,13 +81,8 @@
 <ul>
 {% if current_user.is_authenticated() %}
 <li>Hello {{ current_user.email }}</li>
-<li><a href="{{ url_for('security.logout') }}">Logout</a></li>
-<li><a href="{{ url_for('profile.profile') }}">Profile</a></li>
-{% else %}
-<li><a href="{{ url_for('security.login') }}">Login</a></li>
-<li><a href="{{ url_for('security.register') }}">Register</a></li>
-{% endif %}
 <li><a href="{{ url_for('place.new_place') }}">Add new place</a></li>
+{% endif %}
 </ul>
 
 <!-- Modal -->

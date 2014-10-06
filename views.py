@@ -1,6 +1,6 @@
 from flask.ext.security import Security, MongoEngineUserDatastore, current_user
 from flask.ext.wtf import Form
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask.views import MethodView
 from podvesite.models import Role, User, Place
 from podvesite import db, app
@@ -14,6 +14,7 @@ users = Blueprint('users', __name__, template_folder='templates')
 calendar = Blueprint('cal', __name__, template_folder='templates')
 place = Blueprint('place', __name__, template_folder='templates')
 profile = Blueprint('profile', __name__, template_folder='templates')
+admin = Blueprint('admin', __name__, template_folder='templates')
 
 
 class ExtendedRegisterForm(RegisterForm):
@@ -110,6 +111,17 @@ class AddNewPlaceView(MethodView):
             return render_template('new_place.html', form=self.newPlaceForm)
         return redirect(url_for('place.new_place'))
 
+
+class AdminView(MethodView):
+
+    def get(self, slug):
+        if slug is None:
+            return render_template('admin.html')
+        elif slug == 'roles':
+            return render_template('roles.html', slug=slug)
+        else:
+            abort(404)
+
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore,
                     register_form=ExtendedRegisterForm,
@@ -125,3 +137,7 @@ profile.add_url_rule(
     '/profile', view_func=ProfileView.as_view('profile'))
 profile.add_url_rule(
     '/profile/edit/', view_func=ProfileViewEdit.as_view('profile_edit'))
+admin.add_url_rule(
+    '/admin/', defaults={'slug': None}, view_func=AdminView.as_view('admin'))
+admin.add_url_rule(
+    '/admin/<slug>', view_func=AdminView.as_view('some'))
