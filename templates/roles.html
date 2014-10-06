@@ -1,0 +1,10 @@
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% include "security/_messages.html" %}
+{% extends "base.html" %}
+{% block title %}Админский раздел{% endblock %}
+{% block mainmenu %}
+{% with current="admins" %}{% include "menu.html" %}{% endwith %}
+{% endblock %}
+{% block content %}
+<h1>Roles</h1>
+{% endblock %}
