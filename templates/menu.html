@@ -10,4 +10,13 @@
         <li><a href="/places/" tabindex="-1">База мест</a></li>
     </ul>
     </li>
+    <li class="dropdown{% if current == "admins" %} active{% endif %}">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    Админам
+    <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a href="{{ url_for('admin.admin') }}roles" tabindex="-1">Роли</a></li>
+    </ul>
+    </li>
 {% endif %}
