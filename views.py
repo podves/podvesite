@@ -6,6 +6,8 @@ from podvesite.models import Role, User, Place
 from podvesite import db, app
 from podvesite.htmlCalendar import MonthlyCalendar
 from wtforms.validators import NumberRange, DataRequired
+from flask_security.forms import RegisterForm, LoginForm
+from wtforms.fields import *
 
 main = Blueprint('main', __name__, template_folder='templates')
 users = Blueprint('users', __name__, template_folder='templates')
@@ -13,21 +15,27 @@ calendar = Blueprint('cal', __name__, template_folder='templates')
 place = Blueprint('place', __name__, template_folder='templates')
 profile = Blueprint('profile', __name__, template_folder='templates')
 
-from flask_security.forms import RegisterForm
-from wtforms.fields import *
-
 
 class ExtendedRegisterForm(RegisterForm):
     interests = SelectMultipleField(
         'INTERESNTS', choices=[('math', 'математика'),
-        ('it', 'информатика'), ('literature', 'литература'),
-        ('phylosophy', 'философия'), ('music', 'музыка'),
-        ('languages', 'филология'), ('games', 'игры'),
-        ('art', 'искусство')])
+                               ('it', 'информатика'), ('literature',
+                                                       'литература'),
+                               ('phylosophy',
+                                'философия'), ('music', 'музыка'),
+                               ('languages', 'филология'), ('games', 'игры'),
+                               ('art', 'искусство')])
+    email = TextField('Адрес электронной почты')
+    password = PasswordField('Пароль')
+    password_confirm = PasswordField('Подтвердите пароль')
+    submit = SubmitField('Зарегистрироваться')
 
-user_datastore = MongoEngineUserDatastore(db, User, Role)
-security = Security(app, user_datastore,
-                    register_form=ExtendedRegisterForm)
+
+class ExtendedLoginForm(LoginForm):
+    email = TextField('Адрес электронной почты')
+    password = PasswordField('Пароль')
+    remember = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
 
 
 class ListView(MethodView):
@@ -102,6 +110,10 @@ class AddNewPlaceView(MethodView):
             return render_template('new_place.html', form=self.newPlaceForm)
         return redirect(url_for('place.new_place'))
 
+user_datastore = MongoEngineUserDatastore(db, User, Role)
+security = Security(app, user_datastore,
+                    register_form=ExtendedRegisterForm,
+                    login_form=ExtendedLoginForm)
 
 # Register the urls
 main.add_url_rule('/', view_func=ListView.as_view('list'))
