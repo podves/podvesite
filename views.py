@@ -1,27 +1,41 @@
-from flask.ext.security import Security, MongoEngineUserDatastore
+from flask.ext.security import Security, MongoEngineUserDatastore, current_user
+from flask.ext.wtf import Form
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask.views import MethodView
 from podvesite.models import Role, User, Place
 from podvesite import db, app
 from podvesite.htmlCalendar import MonthlyCalendar
 from wtforms.validators import NumberRange, DataRequired
+from flask_security.forms import RegisterForm, LoginForm
+from wtforms.fields import *
 
 main = Blueprint('main', __name__, template_folder='templates')
 users = Blueprint('users', __name__, template_folder='templates')
 calendar = Blueprint('cal', __name__, template_folder='templates')
 place = Blueprint('place', __name__, template_folder='templates')
-
-from flask_security.forms import RegisterForm
-from wtforms.fields import *
+profile = Blueprint('profile', __name__, template_folder='templates')
 
 
 class ExtendedRegisterForm(RegisterForm):
     interests = SelectMultipleField(
-        'INTERESNTS', choices=[('math', 'математика'), ('it', 'информатика'), ('literature', 'литература'), ('phylosophy', 'философия'), ('music', 'музыка'), ('languages', 'филология'), ('games', 'игры'), ('art', 'искусство')])
+        'INTERESNTS', choices=[('math', 'математика'),
+                               ('it', 'информатика'), ('literature',
+                                                       'литература'),
+                               ('phylosophy',
+                                'философия'), ('music', 'музыка'),
+                               ('languages', 'филология'), ('games', 'игры'),
+                               ('art', 'искусство')])
+    email = TextField('Адрес электронной почты')
+    password = PasswordField('Пароль')
+    password_confirm = PasswordField('Подтвердите пароль')
+    submit = SubmitField('Зарегистрироваться')
 
-user_datastore = MongoEngineUserDatastore(db, User, Role)
-security = Security(app, user_datastore,
-                    register_form=ExtendedRegisterForm)
+
+class ExtendedLoginForm(LoginForm):
+    email = TextField('Адрес электронной почты')
+    password = PasswordField('Пароль')
+    remember = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
 
 
 class ListView(MethodView):
@@ -45,14 +59,32 @@ class CalendarView(MethodView):
         outputFile.close()
         return render_template('calendar.html')
 
-from flask.ext.wtf import Form
+
+class ProfileView(MethodView):
+
+    def get(self):
+        items = User.objects.get_or_404(email=current_user.email)
+        return render_template('profile.html', items=items)
+
+
+class ProfileViewEdit(MethodView):
+
+    def get(self):
+
+        class ProfileEditForm(Form):
+            email = StringField(default=current_user.email)
+
+        self.EditForm = ProfileEditForm()
+        return render_template('profile_edit_form.html', form=self.EditForm)
 
 
 class AddNewPlaceForm(Form):
     address = StringField(validators=[DataRequired()])
     contact = StringField(validators=[DataRequired()])
     time = StringField(validators=[DataRequired()])
-    capacity = DecimalField(validators=[NumberRange(min=1, message="Please enter the integer number")])
+    capacity = DecimalField(
+        validators=[NumberRange(min=1,
+                                message="Please enter the integer number")])
     comment = StringField(validators=[DataRequired()])
 
 
@@ -78,6 +110,10 @@ class AddNewPlaceView(MethodView):
             return render_template('new_place.html', form=self.newPlaceForm)
         return redirect(url_for('place.new_place'))
 
+user_datastore = MongoEngineUserDatastore(db, User, Role)
+security = Security(app, user_datastore,
+                    register_form=ExtendedRegisterForm,
+                    login_form=ExtendedLoginForm)
 
 # Register the urls
 main.add_url_rule('/', view_func=ListView.as_view('list'))
@@ -85,3 +121,7 @@ users.add_url_rule('/users', view_func=UsersView.as_view('users'))
 calendar.add_url_rule('/calendar', view_func=CalendarView.as_view('calend'))
 place.add_url_rule(
     '/new_place', view_func=AddNewPlaceView.as_view('new_place'))
+profile.add_url_rule(
+    '/profile', view_func=ProfileView.as_view('profile'))
+profile.add_url_rule(
+    '/profile/edit/', view_func=ProfileViewEdit.as_view('profile_edit'))

@@ -15,11 +15,12 @@ db = MongoEngine(app)
 
 def register_blueprints(app):
     # Prevents circular imports
-    from podvesite.views import main, users, calendar, place
+    from podvesite.views import main, users, calendar, place, profile
     app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(calendar)
     app.register_blueprint(place)
+    app.register_blueprint(profile)
 
 register_blueprints(app)
 
