@@ -1,4 +1,5 @@
-from flask.ext.security import Security, MongoEngineUserDatastore, current_user
+from flask.ext.security import Security, MongoEngineUserDatastore, \
+    current_user, login_required
 from flask.ext.wtf import Form
 from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask.views import MethodView
@@ -18,14 +19,15 @@ admin = Blueprint('admin', __name__, template_folder='templates')
 
 
 class ExtendedRegisterForm(RegisterForm):
-    interests = SelectMultipleField(
-        'INTERESNTS', choices=[('math', 'математика'),
+    get_array_from_database = [('math', 'математика'),
                                ('it', 'информатика'), ('literature',
                                                        'литература'),
                                ('phylosophy',
                                 'философия'), ('music', 'музыка'),
                                ('languages', 'филология'), ('games', 'игры'),
-                               ('art', 'искусство')])
+                               ('art', 'искусство')]
+    interests = SelectMultipleField(
+        'INTERESNTS', choices=get_array_from_database)
     email = TextField('Адрес электронной почты')
     password = PasswordField('Пароль')
     password_confirm = PasswordField('Подтвердите пароль')
@@ -112,15 +114,41 @@ class AddNewPlaceView(MethodView):
         return redirect(url_for('place.new_place'))
 
 
+class MainRoleForm(Form):
+    name = StringField('Роль', validators=[DataRequired()])
+    description = TextAreaField('Описание', validators=[DataRequired()])
+    submit = SubmitField('Добавить', description="Добавить роль")
+
+
 class AdminView(MethodView):
 
+    def __init__(self):
+        self.RoleForm = MainRoleForm()
+
+    @login_required
     def get(self, slug):
+
         if slug is None:
             return render_template('admin.html')
         elif slug == 'roles':
-            return render_template('roles.html', slug=slug)
+            return render_template('roles.html', form=self.RoleForm,
+                                   roles=Role.objects.all())
         else:
             abort(404)
+
+    @login_required
+    def post(self, slug):
+        if slug == 'roles':
+            if self.RoleForm.validate():
+                roles = Role()
+                roles.name = str(self.RoleForm.name.data)
+                roles.description = str(self.RoleForm.description.data)
+                roles.save()
+                flash('Новая роль успешно добавлена.')
+            else:
+                return render_template('roles.html', form=self.RoleForm)
+        return redirect(url_for('admin.admin') + slug)
+
 
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore,

@@ -2,6 +2,11 @@ from flask.ext.security import UserMixin, RoleMixin
 from podvesite import db
 
 
+class Theme(db.Document):
+    name = db.StringField(max_length=128, unique=True)
+    description = db.StringField(max_length=255)
+
+
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)

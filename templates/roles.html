@@ -1,10 +1,27 @@
-{% from "security/_macros.html" import render_field_with_errors, render_field %}
-{% include "security/_messages.html" %}
 {% extends "base.html" %}
 {% block title %}Админский раздел{% endblock %}
 {% block mainmenu %}
 {% with current="admins" %}{% include "menu.html" %}{% endwith %}
 {% endblock %}
 {% block content %}
-<h1>Roles</h1>
+<h1>Роли</h1>
+{% if roles %}
+    <h2>Список ролей</h2>
+    {% for role in roles %}
+        <p>{{ role.name }} &dash; {{ role.description }}</p>
+    {% endfor %}
+{% endif %}
+<h2>Добавить роль</h2>
+<form method="post" name="roles">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name|safe }}
+        {% for error in form.name.errors %}
+            <span style="color: red;">{{error}}</span>
+        {% endfor %}
+    {{ form.description.label }} {{ form.description }}
+        {% for error in form.description.errors %}
+            <span style="color: red;">{{error}}</span>
+    	{% endfor %}
+    <br>{{ form.submit(class_="btn btn-primary")|safe }}
+</form>
 {% endblock %}

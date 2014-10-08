@@ -69,15 +69,15 @@
     <article>
         <div class="container">
 
-{%- with messages = get_flashed_messages(with_categories=true) -%}
-{% if messages %}
-<ul class=flashes>
-{% for category, message in messages %}
-<li class="{{ category }}">{{ message }}</li>
-{% endfor %}
-</ul>
-{% endif %}
-{%- endwith %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
 <ul>
 {% if current_user.is_authenticated() %}
 <li>Hello {{ current_user.email }}</li>
@@ -85,15 +85,7 @@
 {% endif %}
 </ul>
 
-<!-- Modal -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-header">
-<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-<h3 id="myModalLabel">Modal header</h3>
-</div>
-<div class="modal-body">
-</div>
-</div>
+
 
             {% block content %}{% endblock %}
         </div>
